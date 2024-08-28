@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>A-Frame with OpenAI</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-entity position="0 1.5 -3">
+        <input id="userInput" type="text" value="Type something..." style="width: 300px; padding: 5px;">
+      </a-entity>
+
+      <a-box position="0 0.5 -3" depth="0.2" height="0.5" width="3.5" color="#000" onclick="checkConnection()">
+        <a-text value="Check Connection" align="center" position="0 0.2 0.2"></a-text>
+      </a-box>
+
+      <a-text id="statusText" value="Status: Not Checked" position="-1.5 0.5 -3" color="#FFF"></a-text>
+    </a-scene>
+
+    <script>
+      function checkConnection() {
+        const userInput = document.getElementById('userInput').value;
+        
+        fetch('/check-openai', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ input: userInput })
+        })
+        .then(response => response.json())
+        .then(data => {
+          const statusText = document.getElementById('statusText');
+          if (data.status === 'connected') {
+            statusText.setAttribute('value', `Status: Connected\nResponse: ${data.response}`);
+          } else {
+            statusText.setAttribute('value', `Status: Failed\nError: ${data.error}`);
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
